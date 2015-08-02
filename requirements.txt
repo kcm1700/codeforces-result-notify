@@ -1,0 +1,5 @@
+beautifulsoup4
+redis
+requests
+selenium
+six
