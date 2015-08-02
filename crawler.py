@@ -44,7 +44,7 @@ r_server = redis.StrictRedis(host='localhost',port=6379,db=1)
 redisListName = 'codeforces_rating'
 
 # ircChannel = input('irc channel name? ')
-ircChannel = '#icpc-test'
+ircChannel = '#icpc'
 
 # WebDriver init
 driver = webdriver.PhantomJS('phantomjs')
@@ -89,7 +89,10 @@ while True:
     ratingList = []
     lastPage = 1
     i = 1
-    while i <= lastPage:
+    handleSet = set()
+    retry = False
+
+    while i <= lastPage and i <= 10:
         print("[{0}] processing page {1}...".format(datetime.datetime.now(), i))
         try:
             parsed = GetRatings(i)
@@ -98,9 +101,22 @@ while True:
             print("Exception: %s" % e)
             traceback.print_exc()
             continue
+        for (_, handle, _, _) in parsed['ratings']:
+            if handle in handleSet:
+                retry = True
+                break
+            handleSet.add(handle)
+
+        if retry:
+            break
         ratingList += parsed['ratings']
         lastPage = parsed['lastpage']
         i += 1
+
+    if retry:
+        print("retrying: duplicated handle")
+        time.sleep(60)
+        continue
 
     if not firstTime:
         prevMap={}
@@ -110,7 +126,7 @@ while True:
             if v[1] not in prevMap:
                 irc_message = "[Codeforces]\x0303 {0} at #{1} with {2}. (count: {3})".format(v[1], v[0], v[3], v[2])
             else:
-                if v[3] == prevMap[v[1]][3]:
+                if v[2] == prevMap[v[1]][2]:
                     continue
                 prevRating = int(prevMap[v[1]][3])
                 newRating = int(v[3])
