@@ -134,13 +134,14 @@ while True:
                     sign = "\x0307+"
                 else:
                     sign = "\x0304-"
-                irc_message = "[Codeforces] {0} at #{1} with {4} -> \x0303 {2}\x0f ({5}). (count: {3})".format(
+                irc_message = "[Codeforces] {0} at #{6} -> #{1} with {4} -> \x0303 {2}\x0f ({5}). (count: {3})".format(
                     v[1], # id {0}
                     v[0], # rank {1}
                     v[3], # rating {2}
                     v[2], # count {3}
                     prevRating, # {4}
-                    "{0}{1}\x0f".format(sign, abs(newRating - prevRating)) # {5}
+                    "{0}{1}\x0f".format(sign, abs(newRating - prevRating)), # {5}
+                    prevMap[v[1]][0] #{6}
                     )
             irc_channel = ircChannel
 
