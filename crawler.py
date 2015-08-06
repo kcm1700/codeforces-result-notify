@@ -97,10 +97,10 @@ while True:
         try:
             parsed = GetRatings(i)
         except Exception as e:
-            failed = True
+            retry = True
             print("Exception: %s" % e)
             traceback.print_exc()
-            continue
+            break
         for (_, handle, _, _) in parsed['ratings']:
             if handle in handleSet:
                 retry = True
@@ -139,7 +139,7 @@ while True:
                     v[0],
                     v[3],
                     v[2],
-                    "{0} {1}{2}".format(prevRating, sign, newRating - prevRating)
+                    "{0} {1}{2}".format(prevRating, sign, abs(newRating - prevRating))
                     )
             irc_channel = ircChannel
 
