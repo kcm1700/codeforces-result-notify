@@ -122,11 +122,13 @@ while True:
         prevMap={}
         for v in prevRatings:
             prevMap[v[1]] = v
-        for v in ratingList:
+        for idx, v in enumerate(list(ratingList)):
             if v[1] not in prevMap:
                 irc_message = "[Codeforces]\x0303 {0} at #{1} with {2}. (count: {3})".format(v[1], v[0], v[3], v[2])
             else:
-                if v[2] == prevMap[v[1]][2]:
+                if v[2] <= prevMap[v[1]][2]:
+                    # do not trust the server
+                    ratingList[idx] = prevMap[v[1]]
                     continue
                 prevRating = int(prevMap[v[1]][3])
                 newRating = int(v[3])
@@ -161,7 +163,13 @@ while True:
         driver=None
         gc.collect()
     time.sleep(60*10)
-    driver = webdriver.PhantomJS('phantomjs')
+
+    while driver is None:
+        try:
+            driver = webdriver.PhantomJS('phantomjs')
+        except:
+            time.sleep(5*1000)
+            pass
 
 
 
