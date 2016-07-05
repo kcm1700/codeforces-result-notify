@@ -13,7 +13,7 @@ def ParseRatingsPage(page):
         'lastpage': 2
     }
     """
-    soup = BeautifulSoup(page)
+    soup = BeautifulSoup(page, "html.parser")
     trs = soup.find('div', class_='ratingsDatatable').find('table').find_all('tr')
     result = []
     warn = False

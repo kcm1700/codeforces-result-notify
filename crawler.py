@@ -41,7 +41,7 @@ if len(prevRatings) > 0:
     firstTime = False
 
 r_server = redis.StrictRedis(host='localhost',port=6379,db=1)
-redisListName = 'codeforces_rating'
+redisListName = 'irc-write'
 
 # ircChannel = input('irc channel name? ')
 ircChannel = '#icpc'
@@ -79,7 +79,7 @@ def GetPageSource(desiredUrl):
     return source
 
 def GetRatings(page):
-    url = 'http://codeforces.com/ratings/country/Korea, Republic of/page/' + str(page)
+    url = 'http://codeforces.com/ratings/country/Korea,%20Republic%20of/page/' + str(page)
     source = GetPageSource(url)
     return parser.ParseRatingsPage(source)
 
@@ -119,6 +119,9 @@ while True:
         continue
 
     if not firstTime:
+        msg = "JOIN {}".format(ircChannel)
+        print(msg)
+        r_server.rpush(redisListName, msg)
         prevMap={}
         for v in prevRatings:
             prevMap[v[1]] = v
@@ -147,10 +150,9 @@ while True:
                     )
             irc_channel = ircChannel
 
-            msg = irc_channel + ' ' + irc_message
+            msg = "PRIVMSG {} :{}".format(irc_channel, irc_message)
             print(msg)
             r_server.rpush(redisListName, msg)
-        r_server.publish('irc-feed', redisListName)
     # end of firstTime check
     print ("finished")
     prevRatings = ratingList
