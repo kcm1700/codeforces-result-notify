@@ -7,6 +7,7 @@ import traceback
 import datetime
 import time
 import gc
+import signal
 import sys
 import pickle
 from selenium import webdriver
@@ -56,12 +57,21 @@ def GetPageSource(desiredUrl):
     print("launching phantomjs for checking " + desiredUrl)
     try:
         for trial in range(0,3):
+            # phantomjs freezes randomly, hack to fix the issue
+            timelimit = 30 
+            def timeout_handler():
+                raise Exception('timeout')
+            handler = signal.signal(signal.SIGALRM, timeout_handler)
+
             try:
+                signal.alarm(timelimit)
                 driver.get(desiredUrl)
                 if desiredUrl == driver.current_url:
                     break
             except:
                 pass
+            finally:
+                signal.signal(signal.SIGALRM, handler)
         if desiredUrl != driver.current_url:
             failed = True
             print("can't open url %s (now %s)" % (desiredUrl,driver.current_url))
