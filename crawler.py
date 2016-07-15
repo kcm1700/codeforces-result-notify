@@ -71,6 +71,7 @@ def GetPageSource(desiredUrl):
             except:
                 pass
             finally:
+                signal.alarm(0)
                 signal.signal(signal.SIGALRM, handler)
         if desiredUrl != driver.current_url:
             failed = True
