@@ -134,30 +134,30 @@ while True:
         print(msg)
         r_server.rpush(redisListName, msg)
         prevMap={}
-        for v in prevRatings:
-            prevMap[v[1]] = v
-        for idx, v in enumerate(list(ratingList)):
-            if v[1] not in prevMap:
-                irc_message = "[Codeforces]\x0303 {0} at #{1} with {2}. (count: {3})".format(v[1], v[0], v[3], v[2])
+        for (rank, handle, num_compete, rating) in prevRatings:
+            prevMap[handle] = (rank, handle, num_compete, rating)
+        for idx, (rank, handle, num_compete, rating) in enumerate(list(ratingList)):
+            if handle not in prevMap:
+                irc_message = "[Codeforces]\x0303 {0} at #{1} with {2}. (count: {3})".format(handle, rank, rating, num_compete)
             else:
-                if v[2] <= prevMap[v[1]][2]:
+                if int(num_compete) <= int(prevMap[handle][2]):
                     # do not trust the server
-                    ratingList[idx] = prevMap[v[1]]
+                    ratingList[idx] = prevMap[handle]
                     continue
-                prevRating = int(prevMap[v[1]][3])
-                newRating = int(v[3])
+                prevRating = int(prevMap[handle][3])
+                newRating = int(rating)
                 if prevRating <= newRating:
                     sign = "\x0307+"
                 else:
                     sign = "\x0304-"
                 irc_message = "[Codeforces] {0} at #{6} -> #{1} with {4} -> \x0303 {2}\x0f ({5}). (count: {3})".format(
-                    v[1], # id {0}
-                    v[0], # rank {1}
-                    v[3], # rating {2}
-                    v[2], # count {3}
+                    handle, # id {0}
+                    rank, # rank {1}
+                    rating, # rating {2}
+                    num_compete, # count {3}
                     prevRating, # {4}
                     "{0}{1}\x0f".format(sign, abs(newRating - prevRating)), # {5}
-                    prevMap[v[1]][0] #{6}
+                    prevMap[handle][0] #{6}
                     )
             irc_channel = ircChannel
 
