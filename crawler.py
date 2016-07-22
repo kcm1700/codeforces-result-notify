@@ -48,7 +48,7 @@ redisListName = 'irc-write'
 ircChannel = '#icpc'
 
 # WebDriver init
-driver = webdriver.PhantomJS('phantomjs')
+driver = webdriver.PhantomJS('phantomjs', service_args=['--disk-cache=false', '--max-disk-cache-size=0'])
 # end of WebDriver
 
 def GetPageSource(desiredUrl):
@@ -65,6 +65,9 @@ def GetPageSource(desiredUrl):
 
             try:
                 signal.alarm(timelimit)
+                driver.delete_all_cookies()
+                driver.get('javascript:localStorage.clear();')
+                time.sleep(1)
                 driver.get(desiredUrl)
                 if desiredUrl == driver.current_url:
                     break
@@ -107,6 +110,7 @@ while True:
         print("[{0}] processing page {1}...".format(datetime.datetime.now(), i))
         try:
             parsed = GetRatings(i)
+            print(parsed)
         except Exception as e:
             retry = True
             print("Exception: %s" % e)
